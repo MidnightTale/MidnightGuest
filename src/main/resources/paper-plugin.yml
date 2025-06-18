@@ -4,3 +4,8 @@ main: fun.mntale.midnightGuest.MidnightGuest
 api-version: '1.21'
 authors: [ MidnightTale_ ]
 website: https://mntale.fun
+folia-supported: true
+permissions:
+  visitor.bypass:
+    description: Allows full interaction with the world
+    default: false
