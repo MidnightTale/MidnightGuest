@@ -17,8 +17,15 @@ import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.plugin.java.JavaPlugin;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.event.ClickEvent;
+import org.bukkit.Sound;
 
 public final class MidnightGuest extends JavaPlugin implements Listener {
+
+    private static final String VERIFY_URL = "https://mntale.fun/wiki/general/how-to-verify";
 
     @Override
     public void onEnable() {
@@ -33,11 +40,46 @@ public final class MidnightGuest extends JavaPlugin implements Listener {
         return entity instanceof Player && isGuest((Player) entity);
     }
 
+    private void notifyGuest(Player player) {
+        Component msg = Component.text()
+            .content("คุณไม่สามารถทำอะไรได้จนกว่าจะเชื่อมบัณชีที่ ")
+            .color(NamedTextColor.RED)
+            .append(
+                Component.text(VERIFY_URL)
+                    .color(NamedTextColor.AQUA)
+                    .decorate(TextDecoration.UNDERLINED)
+                    .clickEvent(ClickEvent.openUrl(VERIFY_URL))
+            )
+            .build();
+        player.sendMessage(msg);
+        player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 0.4f, 1.2f);
+    }
+
     // === BLOCK INTERACTIONS ===
-    @EventHandler(priority = EventPriority.HIGHEST) public void onBreak(BlockBreakEvent e) { if (isGuest(e.getPlayer())) e.setCancelled(true); }
-    @EventHandler(priority = EventPriority.HIGHEST) public void onPlace(BlockPlaceEvent e) { if (isGuest(e.getPlayer())) e.setCancelled(true); }
-    @EventHandler(priority = EventPriority.HIGHEST) public void onInteract(PlayerInteractEvent e) { if (isGuest(e.getPlayer())) e.setCancelled(true); }
-    @EventHandler(priority = EventPriority.HIGHEST) public void onUseEntity(PlayerInteractEntityEvent e) { if (isGuest(e.getPlayer())) e.setCancelled(true); }
+    @EventHandler(priority = EventPriority.HIGHEST) public void onBreak(BlockBreakEvent e) {
+        if (isGuest(e.getPlayer())) {
+            e.setCancelled(true);
+            notifyGuest(e.getPlayer());
+        }
+    }
+    @EventHandler(priority = EventPriority.HIGHEST) public void onPlace(BlockPlaceEvent e) {
+        if (isGuest(e.getPlayer())) {
+            e.setCancelled(true);
+            notifyGuest(e.getPlayer());
+        }
+    }
+    @EventHandler(priority = EventPriority.HIGHEST) public void onInteract(PlayerInteractEvent e) {
+        if (isGuest(e.getPlayer())) {
+            e.setCancelled(true);
+            notifyGuest(e.getPlayer());
+        }
+    }
+    @EventHandler(priority = EventPriority.HIGHEST) public void onUseEntity(PlayerInteractEntityEvent e) {
+        if (isGuest(e.getPlayer())) {
+            e.setCancelled(true);
+            notifyGuest(e.getPlayer());
+        }
+    }
 
     // === INVENTORY & ITEMS ===
     @EventHandler(priority = EventPriority.HIGHEST) public void onDrop(PlayerDropItemEvent e) { if (isGuest(e.getPlayer())) e.setCancelled(true); }
